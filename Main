@@ -1,0 +1,50 @@
+package com.example.qrcode
+
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.zxing.integration.android.IntentIntegrator
+import com.google.zxing.integration.android.IntentResult
+
+
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        val button = findViewById<Button>(R.id.btn_leitura)
+
+        button.setOnClickListener {
+            scan()
+        }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            val result: IntentResult =
+                IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+            if (result.contents == null) {
+                Toast.makeText(this, "Cancelar", Toast.LENGTH_LONG).show()
+            } else {
+                val builder = AlertDialog.Builder(this)
+                    .setTitle("Resultado")
+                    .setMessage(result.contents)
+                    .setPositiveButton("OK", null)
+                    builder.show()
+            }
+        }
+    }
+
+    private fun scan() {
+        val scanner = IntentIntegrator(this)
+        scanner.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+        scanner.setBeepEnabled(true) // retirar o alerta do scanner
+        scanner.initiateScan()
+    }
+}
